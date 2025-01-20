@@ -127,3 +127,154 @@ select, input[type="text"], input[type="number"] {
   border-color: #28a745;
   box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
 }
+
+.summary-page {
+  background-color: #00b4d8;
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+}
+
+.class-details {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.class-details p {
+  margin: 5px 0;
+  color: white;
+}
+
+.summary-page h2 {
+  margin-top: 20px;
+}
+
+.summary-page ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.summary-page li {
+  margin: 5px 0;
+}
+
+.summary-page button {
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.summary-page button:first-of-type {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.summary-page button:last-of-type {
+  background-color: #f44336;
+  color: white;
+  margin-left: 10px;
+}
+
+.summary-container {
+  background-color: #00b4d8;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 20px auto;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.summary-header {
+  margin-bottom: 30px;
+}
+
+.summary-header h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.stats-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  height: 8px;
+  background: linear-gradient(to right, #ff6b6b, #4ecdc4);
+  border-radius: 4px;
+}
+
+.summary-table {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 10px;
+  font-weight: bold;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-buttons button {
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.action-buttons button:hover {
+  transform: scale(1.05);
+}
+
+.btn-save {
+  background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+  color: white;
+}
+
+.btn-excel {
+  background: linear-gradient(to right, #4ecdc4, #45b7af);
+  color: white;
+}
+
+.btn-subject {
+  background: linear-gradient(to right, #45b7af, #4ecdc4);
+  color: white;
+}
+
+.btn-back {
+  background: linear-gradient(to right, #ff8e8e, #ff6b6b);
+  color: white;
+}

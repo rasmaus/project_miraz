@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import AttendancePage from "./AttendancePage";
 import * as XLSX from "xlsx";
+import SummaryPage from "./SummaryPage";
 
 function App() {
   const [formDetails, setFormDetails] = useState({
@@ -15,6 +16,8 @@ function App() {
 
   const [students, setStudents] = useState([]);
   const [showAttendancePage, setShowAttendancePage] = useState(false);
+  const [showSummaryPage, setShowSummaryPage] = useState(false);
+  const [detainedStudents, setDetainedStudents] = useState([]);
   const [options, setOptions] = useState({
     professors: [],
     subjects: [],
@@ -122,7 +125,7 @@ function App() {
 
   const handleSaveAttendance = (updatedStudents) => {
     console.log("Final Attendance Data:", updatedStudents);
-    alert("Attendance data saved successfully!");
+    // You can add more functionality here if needed
   };
 
   const handleAddOption = async (type) => {
@@ -159,6 +162,17 @@ function App() {
     }
   };
 
+  const handleShowSummary = (detainedStudents) => {
+    setDetainedStudents(detainedStudents);
+    setShowAttendancePage(false);
+    setShowSummaryPage(true);
+  };
+
+  const handleBackToDashboard = () => {
+    setShowSummaryPage(false);
+    setShowAttendancePage(false);
+  };
+
   useEffect(() => {
     try {
       const savedOptions = localStorage.getItem('options');
@@ -184,7 +198,7 @@ function App() {
 
   return (
     <div className="App">
-      {!showAttendancePage ? (
+      {!showAttendancePage && !showSummaryPage ? (
         <div className="dashboard">
           <h1>Dashboard</h1>
           
@@ -292,11 +306,18 @@ function App() {
             </button>
           </form>
         </div>
-      ) : (
+      ) : showAttendancePage ? (
         <AttendancePage
           students={students}
           totalClasses={parseInt(formDetails.totalClasses)}
           onSave={handleSaveAttendance}
+          onShowSummary={handleShowSummary}
+        />
+      ) : (
+        <SummaryPage
+          detainedStudents={detainedStudents}
+          classDetails={formDetails}
+          onBack={handleBackToDashboard}
         />
       )}
     </div>

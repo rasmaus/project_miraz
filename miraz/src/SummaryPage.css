@@ -1,0 +1,81 @@
+.summary-container {
+  background-color: #00b4d8;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 600px;
+  margin: 20px auto;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.summary-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.summary-header h1 {
+  font-size: 28px;
+  margin: 0;
+}
+
+.summary-table {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 10px;
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.table-body {
+  max-height: 30000px; /* Set a max height for scrolling */
+  overflow-y: 30000px; /* Enable scrolling */
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.table-row:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05); /* Alternate row color */
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-excel, .btn-back {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-excel {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.btn-back {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.btn-excel:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+.btn-back:hover {
+  background-color: #d32f2f; /* Darker red */
+} 

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "./AttendancePage.css";
 
-function AttendancePage({ students, totalClasses, onSave }) {
+function AttendancePage({ students, totalClasses, onSave, onShowSummary }) {
   const [attendance, setAttendance] = useState(
     students.map((student) => ({ ...student, attended: 0 }))
   );
@@ -14,10 +14,26 @@ function AttendancePage({ students, totalClasses, onSave }) {
   };
 
   const handleSubmit = () => {
+    // Validate if all fields are filled
+    const hasEmptyFields = attendance.some(student => student.attended === 0);
+    if (hasEmptyFields) {
+      alert("Please fill in attendance for all students");
+      return;
+    }
+
+    // Calculate attendance and detained status
     const updatedAttendance = attendance.map((student) => {
       const percentage = (student.attended / totalClasses) * 100;
       return { ...student, percentage, detained: percentage < 75 };
     });
+
+    // Get the list of detained students
+    const detainedStudents = updatedAttendance.filter(student => student.detained);
+    
+    // First show the summary page with detained students
+    onShowSummary(detainedStudents);
+    
+    // Then save the attendance data
     onSave(updatedAttendance);
   };
 
@@ -43,7 +59,7 @@ function AttendancePage({ students, totalClasses, onSave }) {
         ))}
       </div>
       <button className="continue-button" onClick={handleSubmit}>
-        CONTINUE
+        NEXT
       </button>
     </div>
   );
