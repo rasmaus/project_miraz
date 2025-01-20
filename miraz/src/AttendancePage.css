@@ -1,0 +1,30 @@
+.attendance-page {
+    margin: auto;
+    max-width: 500px;
+  }
+  
+  .attendance-table {
+    margin-top: 20px;
+  }
+  
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+  }
+  
+  .table-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+  }
+  
+  .continue-button {
+    background-color: green;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
