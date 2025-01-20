@@ -1,0 +1,83 @@
+.dashboard-container {
+  padding: 20px;
+  background-color: #f0f8ff; /* Light background color */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+  font-size: 24px;
+  color: #333;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center; /* Center align the button */
+  margin-bottom: 20px; /* Space below the button */
+}
+
+.close-button {
+  padding: 10px 20px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.close-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: calc(100% - 100px); /* Adjust width */
+  margin-right: 10px;
+}
+
+button {
+  padding: 8px 12px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+ul {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #ddd; /* Light border */
+}
+
+li button {
+  background-color: red; /* Red for delete */
+}
+
+li button:hover {
+  background-color: darkred; /* Darker red on hover */
+} 

@@ -4,6 +4,7 @@ import "./App.css";
 import AttendancePage from "./AttendancePage";
 import * as XLSX from "xlsx";
 import SummaryPage from "./SummaryPage";
+import Dashboard from "./Dashboard";
 
 function App() {
   const [formDetails, setFormDetails] = useState({
@@ -21,11 +22,17 @@ function App() {
   const [options, setOptions] = useState({
     professors: [],
     subjects: [],
+    branches: [],
   });
+  const [showDashboard, setShowDashboard] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Changing ${name} to:`, value);
+
+    if (name === "totalClasses" && value < 0) {
+      return;
+    }
+
     setFormDetails(prev => ({
       ...prev,
       [name]: value
@@ -83,24 +90,38 @@ function App() {
 
   const parseCSV = (data) => {
     const rows = data.split("\n");
+    const header = rows[0].split(",").map(col => col.trim());
+    const studentIndex = header.indexOf("Student");
+
+    if (studentIndex === -1) {
+      alert("No 'Student' column found in the CSV file.");
+      return [];
+    }
+
     const validRows = rows.slice(1).filter(row => row.trim() !== "");
     return validRows.map((row) => {
-      const [name, rollNumber] = row.split(",");
+      const columns = row.split(",");
       return {
-        name: name ? name.trim() : null,
-        rollNumber: rollNumber ? rollNumber.trim() : null,
+        name: columns[studentIndex] ? columns[studentIndex].trim() : null,
+        rollNumber: columns[studentIndex + 1] ? columns[studentIndex + 1].trim() : null,
       };
     });
   };
 
   const parseExcelData = (data) => {
+    const header = data[0].map(col => col.trim());
+    const studentIndex = header.indexOf("Student");
+
+    if (studentIndex === -1) {
+      alert("No 'Student' column found in the Excel file.");
+      return [];
+    }
+
     const validRows = data.slice(1).filter(row => row.length > 0);
     return validRows.map((row) => {
-      const name = row[0];
-      const rollNumber = row[1];
       return {
-        name: name || null,
-        rollNumber: rollNumber || null,
+        name: row[studentIndex] || null,
+        rollNumber: row[studentIndex + 1] || null,
       };
     });
   };
@@ -162,6 +183,12 @@ function App() {
     }
   };
 
+  const handleDeleteOption = (type, index) => {
+    const updatedOptions = { ...options };
+    updatedOptions[type].splice(index, 1);
+    setOptions(updatedOptions);
+  };
+
   const handleShowSummary = (detainedStudents) => {
     setDetainedStudents(detainedStudents);
     setShowAttendancePage(false);
@@ -188,6 +215,7 @@ function App() {
       setOptions({
         professors: [],
         subjects: [],
+        branches: [],
       });
     }
   }, []);
@@ -198,127 +226,135 @@ function App() {
 
   return (
     <div className="App">
-      {!showAttendancePage && !showSummaryPage ? (
-        <div className="dashboard">
-          <h1>Dashboard</h1>
-          
-          <div className="add-buttons">
-            <button 
-              className="add-button" 
-              onClick={() => handleAddOption('professor')}
-            >
-              + Professor
-            </button>
-            <button 
-              className="add-button" 
-              onClick={() => handleAddOption('subject')}
-            >
-              + Subject
-            </button>
-            <button 
-              className="add-button" 
-              onClick={() => handleAddOption('branch')}
-            >
-              + Branch
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>Professor</label>
-              <select
-                name="professor"
-                value={formDetails.professor}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select Professor</option>
-                {options.professors && options.professors.map((professor, index) => (
-                  <option key={`professor-${index}`} value={professor}>
-                    {professor}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Subject</label>
-              <select
-                name="subject"
-                value={formDetails.subject}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="">Select Subject</option>
-                {options.subjects && options.subjects.map((subject, index) => (
-                  <option key={`subject-${index}`} value={subject}>
-                    {subject}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Branch</label>
-              <input
-                type="text"
-                name="branch"
-                value={formDetails.branch}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Section</label>
-              <input
-                type="text"
-                name="section"
-                value={formDetails.section}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Total Lectures</label>
-              <input
-                type="number"
-                name="totalClasses"
-                value={formDetails.totalClasses}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <p>Click here to insert the database of the student</p>
-              <input
-                type="file"
-                accept=".csv, .xlsx"
-                onChange={handleFileUpload}
-                required
-              />
-            </div>
-
-            <button type="submit" className="submit-button">
-              CONTINUE
-            </button>
-          </form>
-        </div>
-      ) : showAttendancePage ? (
-        <AttendancePage
-          students={students}
-          totalClasses={parseInt(formDetails.totalClasses)}
-          onSave={handleSaveAttendance}
-          onShowSummary={handleShowSummary}
+      {showDashboard ? (
+        <Dashboard 
+          options={options} 
+          setOptions={setOptions} 
+          handleDeleteOption={handleDeleteOption} 
+          onClose={() => setShowDashboard(false)}
         />
       ) : (
-        <SummaryPage
-          detainedStudents={detainedStudents}
-          classDetails={formDetails}
-          onBack={handleBackToDashboard}
-        />
+        <div className="dashboard">
+          <h1>Dashboard</h1>
+          {!showAttendancePage && !showSummaryPage && (
+            <button 
+              className="manage-button" 
+              onClick={() => setShowDashboard(true)}
+            >
+              Manage Professors, Branches, Subjects
+            </button>
+          )}
+
+          {!showAttendancePage && !showSummaryPage ? (
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Professor</label>
+                <select
+                  name="professor"
+                  value={formDetails.professor}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Professor</option>
+                  {options.professors && options.professors.map((professor, index) => (
+                    <option key={`professor-${index}`} value={professor}>
+                      {professor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Subject</label>
+                <select
+                  name="subject"
+                  value={formDetails.subject}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Subject</option>
+                  {options.subjects && options.subjects.map((subject, index) => (
+                    <option key={`subject-${index}`} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Branch</label>
+                <select
+                  name="branch"
+                  value={formDetails.branch}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Branch</option>
+                  {options.branches && options.branches.map((branch, index) => (
+                    <option key={`branch-${index}`} value={branch}>
+                      {branch}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Section</label>
+                <input
+                  type="text"
+                  name="section"
+                  value={formDetails.section}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Total Lectures</label>
+                <input
+                  type="number"
+                  name="totalClasses"
+                  value={formDetails.totalClasses}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+
+              <div className="warning-message">
+                <p style={{ color: 'red' }}>
+                  Please ensure that the uploaded database contains a column named "Student".
+                </p>
+              </div>
+
+              <div className="form-group">
+                <p>Click here to insert the database of the student</p>
+                <input
+                  type="file"
+                  accept=".csv, .xlsx"
+                  onChange={handleFileUpload}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="submit-button">
+                CONTINUE
+              </button>
+            </form>
+          ) : showAttendancePage ? (
+            <AttendancePage
+              students={students}
+              totalClasses={parseInt(formDetails.totalClasses)}
+              onSave={handleSaveAttendance}
+              onShowSummary={handleShowSummary}
+            />
+          ) : (
+            <SummaryPage
+              detainedStudents={detainedStudents}
+              classDetails={formDetails}
+              onBack={handleBackToDashboard}
+            />
+          )}
+        </div>
       )}
     </div>
   );

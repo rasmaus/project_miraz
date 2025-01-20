@@ -33,8 +33,8 @@
 }
 
 .table-body {
-  max-height: 30000px; /* Set a max height for scrolling */
-  overflow-y: 30000px; /* Enable scrolling */
+  max-height: 300px; /* Set a max height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .table-row {

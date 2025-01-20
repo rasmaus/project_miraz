@@ -14,13 +14,6 @@ function AttendancePage({ students, totalClasses, onSave, onShowSummary }) {
   };
 
   const handleSubmit = () => {
-    // Validate if all fields are filled
-    const hasEmptyFields = attendance.some(student => student.attended === 0);
-    if (hasEmptyFields) {
-      alert("Please fill in attendance for all students");
-      return;
-    }
-
     // Calculate attendance and detained status
     const updatedAttendance = attendance.map((student) => {
       const percentage = (student.attended / totalClasses) * 100;
@@ -30,10 +23,10 @@ function AttendancePage({ students, totalClasses, onSave, onShowSummary }) {
     // Get the list of detained students
     const detainedStudents = updatedAttendance.filter(student => student.detained);
     
-    // First show the summary page with detained students
+    // Show the summary page with detained students
     onShowSummary(detainedStudents);
     
-    // Then save the attendance data
+    // Save the attendance data
     onSave(updatedAttendance);
   };
 
