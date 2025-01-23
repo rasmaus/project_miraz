@@ -5,14 +5,14 @@ import AttendancePage from "./AttendancePage";
 import * as XLSX from "xlsx";
 import SummaryPage from "./SummaryPage";
 import Dashboard from "./Dashboard";
+import { parseCSV, parseExcelData } from './utils'; // Assuming you create a utils file for parsing
 
 function App() {
   const [formDetails, setFormDetails] = useState({
     professor: "",
-    subject: "",
+    subjects: [],
     branch: "",
     section: "",
-    totalClasses: "",
   });
 
   const [students, setStudents] = useState([]);
@@ -25,6 +25,7 @@ function App() {
     branches: [],
   });
   const [showDashboard, setShowDashboard] = useState(false);
+  const [attendanceData, setAttendanceData] = useState({}); // New state for attendance data
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -88,49 +89,54 @@ function App() {
     reader.readAsArrayBuffer(file);
   };
 
-  const parseCSV = (data) => {
-    const rows = data.split("\n");
-    const header = rows[0].split(",").map(col => col.trim());
-    const studentIndex = header.indexOf("Student");
+  const handleAttendanceFileUpload = (e, subjectIndex) => {
+    const file = e.target.files[0];
+    if (file) {
+        const fileType = file.name.split(".").pop().toLowerCase();
+        const reader = new FileReader();
 
-    if (studentIndex === -1) {
-      alert("No 'Student' column found in the CSV file.");
-      return [];
+        reader.onload = (event) => {
+            const data = new Uint8Array(event.target.result);
+            let parsedData  ;
+
+            try {
+                if (fileType === "csv") {
+                    const text = event.target.result;
+                    parsedData = parseCSV(text); // Function to parse CSV
+                } else if (fileType === "xlsx" || fileType === "xls") {
+                    const workbook = XLSX.read(data, { type: "array" });
+                    const sheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[sheetName];
+                    parsedData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); // Convert to JSON
+                } else {
+                    alert("Please upload a valid .csv or .xlsx file.");
+                    return;
+                }
+
+                // Update attendance data for the specific subject
+                setAttendanceData(prev => ({
+                    ...prev,
+                    [formDetails.subjects[subjectIndex].name]: parsedData,
+                }));
+            } catch (error) {
+                console.error("Error parsing file:", error);
+                alert("Failed to parse the file. Please ensure it is in the correct format.");
+            }
+        };
+
+        if (fileType === "csv") {
+            reader.readAsText(file);
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
     }
-
-    const validRows = rows.slice(1).filter(row => row.trim() !== "");
-    return validRows.map((row) => {
-      const columns = row.split(",");
-      return {
-        name: columns[studentIndex] ? columns[studentIndex].trim() : null,
-        rollNumber: columns[studentIndex + 1] ? columns[studentIndex + 1].trim() : null,
-      };
-    });
-  };
-
-  const parseExcelData = (data) => {
-    const header = data[0].map(col => col.trim());
-    const studentIndex = header.indexOf("Student");
-
-    if (studentIndex === -1) {
-      alert("No 'Student' column found in the Excel file.");
-      return [];
-    }
-
-    const validRows = data.slice(1).filter(row => row.length > 0);
-    return validRows.map((row) => {
-      return {
-        name: row[studentIndex] || null,
-        rollNumber: row[studentIndex + 1] || null,
-      };
-    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const { professor, subject, branch, section, totalClasses } = formDetails;
+    const { professor, subjects, branch, section } = formDetails;
 
-    if (!professor || !subject || !branch || !section || !totalClasses) {
+    if (!professor || subjects.length === 0 || !branch || !section) {
       alert("Please fill out all the fields before continuing.");
       return;
     }
@@ -224,6 +230,13 @@ function App() {
     console.log('Current options state:', options);
   }, [options]);
 
+  const handleAddSubject = () => {
+    setFormDetails(prev => ({
+      ...prev,
+      subjects: [...prev.subjects, { name: "", totalLectures: "" }],
+    }));
+  };
+
   return (
     <div className="App">
       {showDashboard ? (
@@ -265,20 +278,60 @@ function App() {
               </div>
 
               <div className="form-group">
-                <label>Subject</label>
-                <select
-                  name="subject"
-                  value={formDetails.subject}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select Subject</option>
-                  {options.subjects && options.subjects.map((subject, index) => (
-                    <option key={`subject-${index}`} value={subject}>
-                      {subject}
-                    </option>
-                  ))}
-                </select>
+                <label>Subjects</label>
+                {formDetails.subjects.map((subject, index) => (
+                  <div key={`subject-${index}`}>
+                    <h3>Subject {index + 1}</h3>
+                    <select
+                      value={subject.name}
+                      onChange={(e) => {
+                        const newSubjects = [...formDetails.subjects];
+                        newSubjects[index].name = e.target.value;
+                        setFormDetails(prev => ({
+                          ...prev,
+                          subjects: newSubjects,
+                        }));
+                      }}
+                      required
+                    >
+                      <option value="">Select Subject</option>
+                      {options.subjects && options.subjects
+                        .filter((subjectOption) => 
+                          !formDetails.subjects.some(s => s.name === subjectOption) || subject.name === subjectOption
+                        )
+                        .map((subjectOption, subjectIndex) => (
+                          <option key={`subjectOption-${subjectIndex}`} value={subjectOption}>
+                            {subjectOption}
+                          </option>
+                        ))}
+                    </select>
+                    <input
+                      type="number"
+                      placeholder="Total Lectures"
+                      value={subject.totalLectures}
+                      onChange={(e) => {
+                        const newSubjects = [...formDetails.subjects];
+                        newSubjects[index].totalLectures = e.target.value; // Update total lectures
+                        setFormDetails(prev => ({
+                          ...prev,
+                          subjects: newSubjects,
+                        }));
+                      }}
+                      required
+                    />
+                    <div>
+                      <label>Upload Attendance Data (CSV/XLSX)</label>
+                      <input
+                        type="file"
+                        accept=".csv, .xlsx"
+                        onChange={(e) => handleAttendanceFileUpload(e, index)}
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button type="button" onClick={handleAddSubject}>
+                  Add Subject
+                </button>
               </div>
 
               <div className="form-group">
@@ -309,31 +362,10 @@ function App() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Total Lectures</label>
-                <input
-                  type="number"
-                  name="totalClasses"
-                  value={formDetails.totalClasses}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
               <div className="warning-message">
                 <p style={{ color: 'red' }}>
                   Please ensure that the uploaded database contains a column named "Student".
                 </p>
-              </div>
-
-              <div className="form-group">
-                <p>Click here to insert the database of the student</p>
-                <input
-                  type="file"
-                  accept=".csv, .xlsx"
-                  onChange={handleFileUpload}
-                  required
-                />
               </div>
 
               <button type="submit" className="submit-button">
