@@ -1,30 +1,181 @@
+/* General Page Styles */
 .attendance-page {
-    margin: auto;
-    max-width: 500px;
-  }
-  
-  .attendance-table {
-    margin-top: 20px;
-  }
-  
-  .table-header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-  }
-  
-  .table-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-  }
-  
-  .continue-button {
-    background-color: green;
-    color: white;
+  margin: 20px;
+  padding: 20px;
+  max-width: 90vw; /* Increase maximum width */
+  margin: 0 auto;
+}
+
+/* Table Container Styles */
+.attendance-table-container {
+  width: 100%;
+  max-height: 70vh; /* Set maximum height for the table container */
+  overflow: auto; /* This will show both horizontal and vertical scrollbars as needed */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #888 #f1f1f1; /* For Firefox */
+}
+
+/* Table Styles */
+.attendance-table {
+  min-width: 100%;
+  width: max-content; /* Allow table to grow based on content */
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Header Styles */
+.table-header {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  z-index: 1000;
+}
+
+.table-header th {
+  background-color: #f5f5f5;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.table-body {
+  max-height: calc(70vh - 50px); /* Subtract header height */
+  overflow: visible; /* Changed from scroll to visible to remove duplicate scrollbars */
+  position: relative;
+}
+
+.table-row {
+  display: contents;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.table-row:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.table-row:hover {
+  background-color: #f9f9f9;
+  transition: background-color 0.2s ease;
+}
+
+.table-row input {
+  width: 90%;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table-header span {
+  min-width: 200px; /* Increased from 150px */
+  padding: 16px; /* Increased from 12px */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-align: center;
+  font-size: 15px; /* Increased from 14px */
+  line-height: 1.5;
+  min-height: 48px; /* Increased from 40px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.table-row span, .table-row input {
+  padding: 12px; /* Increased from 8px */
+  text-align: center;
+}
+
+.continue-button {
+  margin-top: 20px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.continue-button:hover {
+  background-color: #45a049;
+}
+
+/* Custom scrollbar styles */
+.attendance-table-container::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  display: block; /* Ensure scrollbar is always visible */
+  background-color: #f1f1f1;
+}
+
+.attendance-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.attendance-table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+  border: 3px solid #f1f1f1;
+  min-height: 40px;
+}
+
+.attendance-table-container::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .attendance-page {
+    margin: 10px;
     padding: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
   }
-  
+
+  .attendance-table {
+    max-height: 80vh;
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: minmax(200px, 2fr) repeat(auto-fit, minmax(150px, 1fr)); /* Increased column sizes */
+  }
+
+  .table-header span {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .table-row input {
+    width: 90%;
+    padding: 4px;
+    margin: 0 4px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .table-container {
+    overflow-x: auto;
+    padding-bottom: 15px;
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: minmax(120px, 2fr) repeat(auto-fit, minmax(100px, 1fr));
+    font-size: 12px;
+  }
+
+  .table-header span {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .table-body {
+    overflow-x: scroll;
+  }
+}

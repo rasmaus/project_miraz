@@ -1,17 +1,27 @@
 import React from "react";
 import * as XLSX from "xlsx";
-import './SummaryPage.css'; // Import the CSS file for styling
+import './SummaryPage.css';
 
 function SummaryPage({ detainedStudents, classDetails, onBack }) {
   const handleExportToExcel = () => {
     const worksheetData = [
-      ["Student Name", "Attendance Percentage", "Subject", "Branch", "Section"],
+      [
+        "Roll Number",
+        "Student Name",
+        "Branch",
+        "Section",
+        ...classDetails.subjects.map(subject => `${subject.name} Attendance`),
+        "Overall Percentage"
+      ],
       ...detainedStudents.map(student => [
+        student.rollNumber,
         student.name,
-        student.percentage.toFixed(2) + "%",
-        classDetails.subject,
         classDetails.branch,
-        classDetails.section
+        classDetails.section,
+        ...classDetails.subjects.map(subject => 
+          `${student.attendance[subject.name]}/${subject.totalLectures} (${((student.attendance[subject.name] / subject.totalLectures) * 100).toFixed(1)}%)`
+        ),
+        student.percentage.toFixed(2) + "%"
       ])
     ];
 
@@ -24,36 +34,60 @@ function SummaryPage({ detainedStudents, classDetails, onBack }) {
   return (
     <div className="summary-container">
       <div className="summary-header">
-        <h1>Detained Students</h1>
+        <h1>Detained Students Summary</h1>
+        <p>Students with attendance below 75% in any subject</p>
       </div>
 
       <div className="summary-table">
         <div className="table-header">
+          <span>Roll Number</span>
           <span>Student Name</span>
-          <span>Attendance Percentage</span>
-          <span>Subject</span>
           <span>Branch</span>
           <span>Section</span>
+          {classDetails.subjects.map((subject, index) => (
+            <span key={index}>{subject.name}</span>
+          ))}
+          <span>Overall %</span>
         </div>
         <div className="table-body">
-          {detainedStudents.map(student => (
-            <div className="table-row" key={student.name}>
+          {detainedStudents.map((student, index) => (
+            <div className="table-row" key={index}>
+              <span>{student.rollNumber}</span>
               <span>{student.name}</span>
-              <span>{student.percentage.toFixed(1)}%</span>
-              <span>{classDetails.subject}</span>
               <span>{classDetails.branch}</span>
               <span>{classDetails.section}</span>
+              {classDetails.subjects.map((subject, subIndex) => {
+                const attendance = student.attendance[subject.name];
+                const percentage = (attendance / subject.totalLectures) * 100;
+                return (
+                  <span 
+                    key={subIndex} 
+                    className={percentage < 75 ? 'low-attendance' : ''}
+                  >
+                    {attendance}/{subject.totalLectures}
+                    <br />
+                    ({percentage.toFixed(1)}%)
+                  </span>
+                );
+              })}
+              <span className={student.percentage < 75 ? 'low-attendance' : ''}>
+                {student.percentage.toFixed(1)}%
+              </span>
             </div>
           ))}
         </div>
       </div>
 
+      <div className="summary-footer">
+        <p>Note: Highlighted values indicate attendance below 75%</p>
+      </div>
+
       <div className="action-buttons">
-        <button className="btn-excel" onClick={handleExportToExcel}>SAVE SHEET</button>
-        <button className="btn-back" onClick={onBack}>BACK</button>
+        <button className="btn-excel" onClick={handleExportToExcel}>Export to Excel</button>
+        <button className="btn-back" onClick={onBack}>Back</button>
       </div>
     </div>
   );
 }
 
-export default SummaryPage; 
+export default SummaryPage;

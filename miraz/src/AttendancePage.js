@@ -2,54 +2,89 @@
 import React, { useState } from "react";
 import "./AttendancePage.css";
 
-function AttendancePage({ students, totalClasses, onSave, onShowSummary }) {
+const AttendancePage = ({ students, totalClasses, onSave, onShowSummary, subjects }) => {
   const [attendance, setAttendance] = useState(
-    students.map((student) => ({ ...student, attended: 0 }))
+    students.map((student) => ({
+      ...student,
+      subjectAttendance: subjects.reduce((acc, subject) => {
+        acc[subject.name] = 0;
+        return acc;
+      }, {})
+    }))
   );
 
-  const handleAttendanceChange = (index, value) => {
+  const handleAttendanceChange = (studentIndex, subjectName, value) => {
     const updatedAttendance = [...attendance];
-    updatedAttendance[index].attended = parseInt(value) || 0;
+    updatedAttendance[studentIndex].subjectAttendance[subjectName] = parseInt(value) || 0;
     setAttendance(updatedAttendance);
   };
 
   const handleSubmit = () => {
-    // Calculate attendance and detained status
     const updatedAttendance = attendance.map((student) => {
-      const percentage = (student.attended / totalClasses) * 100;
-      return { ...student, percentage, detained: percentage < 75 };
+      // Calculate attendance percentage for each subject
+      const subjectPercentages = {};
+      let totalAttended = 0;
+      let totalClasses = 0;
+
+      subjects.forEach(subject => {
+        const attended = student.subjectAttendance[subject.name] || 0;
+        const total = parseInt(subject.totalLectures);
+        const percentage = (attended / total) * 100;
+        subjectPercentages[subject.name] = percentage;
+        totalAttended += attended;
+        totalClasses += total;
+      });
+
+      const overallPercentage = (totalAttended / totalClasses) * 100;
+      
+      // Student is detained if overall attendance or any subject's attendance is below 75%
+      const detained = overallPercentage < 75 || Object.values(subjectPercentages).some(percent => percent < 75);
+
+      return {
+        ...student,
+        attendance: student.subjectAttendance,
+        totalAttended,
+        percentage: overallPercentage,
+        subjectPercentages,
+        detained
+      };
     });
 
-    // Get the list of detained students
+    // Filter only detained students
     const detainedStudents = updatedAttendance.filter(student => student.detained);
-    
-    // Show the summary page with detained students
     onShowSummary(detainedStudents);
-    
-    // Save the attendance data
     onSave(updatedAttendance);
   };
 
   return (
     <div className="attendance-page">
       <h1>Attendance Details</h1>
-      <div className="attendance-table">
-        <div className="table-header">
-          <span>Student Name</span>
-          <span>Classes Attended</span>
-        </div>
-        {attendance.map((student, index) => (
-          <div className="table-row" key={student.rollNumber}>
-            <span>{student.name}</span>
-            <input
-              type="number"
-              min="0"
-              max={totalClasses}
-              value={student.attended}
-              onChange={(e) => handleAttendanceChange(index, e.target.value)}
-            />
+      <div className="attendance-table-container">
+        <div className="attendance-table">
+          <div className="table-header">
+            <span>Student Name</span>
+            {subjects.map((subject) => (
+              <span key={subject.name}>{subject.name} (max: {subject.totalLectures})</span>
+            ))}
           </div>
-        ))}
+          <div className="table-body">
+            {attendance.map((student, studentIndex) => (
+              <div className="table-row" key={student.rollNumber}>
+                <span>{student.name}</span>
+                {subjects.map((subject) => (
+                  <input
+                    key={`${student.rollNumber}-${subject.name}`}
+                    type="number"
+                    min="0"
+                    max={subject.totalLectures}
+                    value={student.subjectAttendance[subject.name]}
+                    onChange={(e) => handleAttendanceChange(studentIndex, subject.name, e.target.value)}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       <button className="continue-button" onClick={handleSubmit}>
         NEXT

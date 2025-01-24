@@ -3,6 +3,8 @@
   background-color: #f0f8ff; /* Light background color */
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .dashboard-header {
@@ -80,4 +82,51 @@ li button {
 
 li button:hover {
   background-color: darkred; /* Darker red on hover */
-} 
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .form-group input,
+  .form-group button {
+    width: 100%;
+  }
+
+  ul {
+    padding-left: 20px;
+  }
+
+  li {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+
+  li button {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h3 {
+    font-size: 18px;
+  }
+}

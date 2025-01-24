@@ -6,6 +6,7 @@
   margin: 20px auto;
   color: white;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden; /* Prevent container scrolling */
 }
 
 .summary-header {
@@ -21,31 +22,55 @@
 .summary-table {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
-  overflow: hidden;
+  overflow: auto; /* Changed from overflow-x to handle both scrollbars */
+  white-space: normal;
+  padding: 10px;
+  max-height: 70vh; /* Added max-height for vertical scroll */
 }
 
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(120px, 1fr) minmax(200px, 1.5fr) minmax(100px, 1fr) minmax(100px, 1fr) repeat(auto-fit, minmax(150px, 1.2fr)) minmax(100px, 1fr);
   padding: 10px;
   font-weight: bold;
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.table-header span, .table-row span {
+  padding: 8px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.4;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
 .table-body {
   max-height: 300px; /* Set a max height for scrolling */
-  overflow-y: auto; /* Enable vertical scrolling */
+  overflow: visible; /* Remove duplicate scrollbars */
+  position: relative;
 }
 
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: minmax(120px, 1fr) minmax(200px, 1.5fr) minmax(100px, 1fr) minmax(100px, 1fr) repeat(auto-fit, minmax(150px, 1.2fr)) minmax(100px, 1fr);
   padding: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .table-row:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.05); /* Alternate row color */
+}
+
+.low-attendance {
+  color: #ff4444;
+  font-weight: bold;
+  background-color: rgba(255, 68, 68, 0.1);
+  border-radius: 4px;
 }
 
 .action-buttons {
@@ -60,6 +85,7 @@
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  transition: none; /* Remove transition effect */
 }
 
 .btn-excel {
@@ -72,10 +98,89 @@
   color: white;
 }
 
-.btn-excel:hover {
-  background-color: #45a049; /* Darker green */
+.summary-footer {
+  margin-top: 20px;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
 }
 
-.btn-back:hover {
-  background-color: #d32f2f; /* Darker red */
-} 
+/* Custom scrollbar styles */
+.summary-table::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  display: block;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.summary-table::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  min-height: 40px;
+}
+
+.summary-table::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3); /* Remove hover effect on scrollbar */
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .summary-container {
+    max-width: 100%;
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: 120px repeat(auto-fill, minmax(100px, 1fr));
+    font-size: 14px;
+  }
+
+  .table-header span,
+  .table-row span {
+    font-size: 13px;
+    padding: 6px;
+  }
+
+  .summary-table {
+    margin: 10px -10px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-excel,
+  .btn-back {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .summary-header h1 {
+    font-size: 20px;
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: 100px repeat(auto-fill, minmax(80px, 1fr));
+    font-size: 12px;
+  }
+
+  .table-header span,
+  .table-row span {
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .table-body {
+    overflow: visible; /* Remove duplicate scrollbars */
+  }
+
+  .summary-footer {
+    font-size: 12px;
+  }
+}
