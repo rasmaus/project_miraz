@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import "./AttendancePage.css";
 
 const AttendancePage = ({ students, totalClasses, onSave, onShowSummary, subjects }) => {
+  const [detainedCriteria, setDetainedCriteria] = useState(75);
   const [attendance, setAttendance] = useState(
     students.map((student) => ({
       ...student,
@@ -37,8 +38,8 @@ const AttendancePage = ({ students, totalClasses, onSave, onShowSummary, subject
 
       const overallPercentage = (totalAttended / totalClasses) * 100;
       
-      // Student is detained if overall attendance or any subject's attendance is below 75%
-      const detained = overallPercentage < 75 || Object.values(subjectPercentages).some(percent => percent < 75);
+      // Student is detained if overall attendance or any subject's attendance is below detainedCriteria
+      const detained = overallPercentage < detainedCriteria || Object.values(subjectPercentages).some(percent => percent < detainedCriteria);
 
       return {
         ...student,
@@ -46,7 +47,8 @@ const AttendancePage = ({ students, totalClasses, onSave, onShowSummary, subject
         totalAttended,
         percentage: overallPercentage,
         subjectPercentages,
-        detained
+        detained,
+        detainedCriteria  // Add criteria to student data
       };
     });
 
@@ -59,6 +61,19 @@ const AttendancePage = ({ students, totalClasses, onSave, onShowSummary, subject
   return (
     <div className="attendance-page">
       <h1>Attendance Details</h1>
+      <div className="criteria-input">
+        <label>
+          Detained Criteria (%):
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={detainedCriteria}
+            onChange={(e) => setDetainedCriteria(Number(e.target.value))}
+            className="criteria-input-field"
+          />
+        </label>
+      </div>
       <div className="attendance-table-container">
         <div className="attendance-table">
           <div className="table-header">
