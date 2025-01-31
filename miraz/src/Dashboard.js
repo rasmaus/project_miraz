@@ -93,12 +93,15 @@ const Dashboard = ({ options, setOptions, handleDeleteOption, onClose }) => {
       </div>
       <ul>
         {options.branches.map((branch, index) => (
-          <li key={index}>{branch}</li>
+          <li key={index}>
+            {branch}{' '}
+            <button onClick={() => handleDeleteOption('branches', index)}>Delete</button>
+          </li>
         ))}
       </ul>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
 
